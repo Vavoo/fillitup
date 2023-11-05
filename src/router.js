@@ -4,6 +4,9 @@ const json = () => import('./components/json.vue')
 const doc = () => import('./components/doc.vue')
 
 const routes = [{
+  path: '/',
+  redirect: { name: 'doc' }
+}, {
   path: '/json',
   name: 'json',
   component: json

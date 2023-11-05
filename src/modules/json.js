@@ -16,5 +16,5 @@ export function useJson () {
     }
   })
 
-  return { jsonAsString, error }
+  return { jsonAsString, error, jsonAsObject }
 }
