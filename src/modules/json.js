@@ -1,24 +1,31 @@
-import { ref, watch } from 'vue'
+import { readonly, ref, toValue } from 'vue'
 
 const jsonAsString = ref('')
 const error = ref('')
 const jsonAsObject = ref({})
 
-watch(jsonAsString, () => {
+function setJsonString (jsonString) {
+  jsonAsString.value = toValue(jsonString)
   try {
-    const obj = JSON.parse(jsonAsString.value)
-    jsonAsObject.value = obj
+    jsonAsObject.value = JSON.parse(jsonAsString.value)
     error.value = ''
   } catch (err) {
     jsonAsObject.value = {}
     error.value = 'JSON is not well defined'
   }
-})
+}
 
-watch(jsonAsObject, () => {
+function setJsonObject (jsonObject) {
+  jsonAsObject.value = toValue(jsonObject)
   jsonAsString.value = JSON.stringify(jsonAsObject.value, null, 2)
-})
+}
 
 export function useJson () {
-  return { jsonAsString, error, jsonAsObject }
+  return {
+    error,
+    jsonAsString: readonly(jsonAsString),
+    jsonAsObject: readonly(jsonAsObject),
+    setJsonString,
+    setJsonObject
+  }
 }

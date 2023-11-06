@@ -2,12 +2,12 @@
   import { useJson } from '../modules/json.js'
   import { format } from '../modules/formatting.js'
 
-  const { jsonAsString } = useJson()
+  const { jsonAsString, setJsonString } = useJson()
 
   function formatJson () {
     const formattedJsonString = format()
     if (formattedJsonString) {
-      jsonAsString.value = formattedJsonString
+      setJsonString(formattedJsonString)
     }
   }
 </script>
@@ -19,7 +19,7 @@
       rows="25"
       class="full"
       :value="jsonAsString"
-      @input="event => jsonAsString = event.target.value" />
+      @input="event => setJsonString(event.target.value)" />
     <button type="button" @click="formatJson">
       Format
     </button>

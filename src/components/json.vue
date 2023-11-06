@@ -1,39 +1,62 @@
 <script setup>
-  import { toValue, ref } from 'vue'
+  import { toValue, ref, watch, toRaw } from 'vue'
   import { useJson } from '../modules/json.js'
 
-  const { jsonAsObject } = useJson()
-  const breadcrumbs = [jsonAsObject]
+  const { jsonAsObject, setJsonObject } = useJson()
+  const breadcrumbs = []
   const objects = ref([])
   const strings = ref([])
+  let json = {}
 
   parseTop()
 
+  watch(jsonAsObject, () => {
+    parseTop()
+  })
+
   function back () {
-    if (breadcrumbs.length > 1) {
+    if (breadcrumbs.length > 0) {
       breadcrumbs.pop()
       parseTop()
     }
   }
 
   function drillDown (entry) {
-    const top = toValue(breadcrumbs[breadcrumbs.length - 1])
-    breadcrumbs.push(top[entry])
+    breadcrumbs.push(entry)
     parseTop()
   }
 
+  function getTopObject () {
+    let top = json
+    for (let i = 0; i < breadcrumbs.length; i++) {
+      if (top[breadcrumbs[i]] !== undefined) {
+        top = top[breadcrumbs[i]]
+      } else {
+        top = undefined
+        break
+      }
+    }
+    return top
+  }
+
   function updateString (entry, newValue) {
-    const top = toValue(breadcrumbs[breadcrumbs.length - 1])
-    top[entry.name] = newValue
-    jsonAsObject.value = { ...jsonAsObject.value }
+    const top = getTopObject()
+    if (top !== undefined) {
+      top[entry.name] = newValue
+      setJsonObject(json)
+    }
     parseTop()
   }
 
   function parseTop () {
     objects.value = []
     strings.value = []
-    const top = toValue(breadcrumbs[breadcrumbs.length - 1])
-    console.log(top, typeof top)
+    json = structuredClone(toRaw(toValue(jsonAsObject)))
+    let top = getTopObject()
+    if (top === undefined) {
+      breadcrumbs.length = 0
+      top = json
+    }
     for (const property in top) {
       console.log(property, typeof top[property])
       if (typeof top[property] === 'object') {
