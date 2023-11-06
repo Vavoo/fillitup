@@ -1,8 +1,11 @@
 import { readonly, ref, toValue } from 'vue'
+import { useStorage } from '@vueuse/core'
 
-const jsonAsString = ref('')
+const jsonAsString = useStorage('jsonAsString', '')
 const error = ref('')
 const jsonAsObject = ref({})
+
+setJsonString(jsonAsString.value)
 
 function setJsonString (jsonString) {
   jsonAsString.value = toValue(jsonString)
